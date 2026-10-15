@@ -47,8 +47,20 @@ const functions = [
 ];
 
 module.exports = http.createServer((req, res) => {
-	const parsedUrl = url.parse(req.url, true);
-	//if (!parsedUrl.path.endsWith('/')) parsedUrl.path += '/';
-	const found = functions.find(f => f(req, res, parsedUrl));
-	if (!found) { res.statusCode = 404; res.end(); }
-}).listen(env.PORT || env.SERVER_PORT, console.log);
+    try {
+        const parsedUrl = url.parse(req.url, true);
+        const found = functions.find(req, res, parsedUrl);
+        if (!found) { 
+            res.statusCode = 404;
+            res.end("Not Found");
+        }
+    } catch (err) {
+        console.error(err);
+        res.writeHead(500, { 'Content-Type': 'text/html' });
+        try {
+            res.end(require('fs').readFileSync(require('path').join(__dirname, 'error.html')));
+        } catch (e) {
+            res.end('<h1>Application Error</h1>');
+        }
+    }
+}).listen(env.PORT || env.SERVER_PORT);
