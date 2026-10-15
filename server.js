@@ -48,7 +48,7 @@ const functions = [
 
 module.exports = http.createServer((req, res) => {
     try {
-        const parsedUrl = url.parse(req.url, true);
+        const parsedUrl = { pathname: req.url.split('?')[0] };
         const found = functions.find(req, res, parsedUrl);
         if (!found) { 
             res.statusCode = 404;
@@ -57,16 +57,18 @@ module.exports = http.createServer((req, res) => {
     } catch (err) {
         console.error(err);
         res.writeHead(500, { 'Content-Type': 'text/html' });
-                try {
-            res.end(require('fs').readFileSync(require('path').resolve(__dirname, 'error.html')));
+        try {
+            res.end(require('fs').readFileSync('./error.html'));
         } catch (e) {
             try {
-                res.end(require('fs').readFileSync(require('path').resolve(process.cwd(), 'error.html')));
+                res.end(require('fs').readFileSync('../error.html'));
             } catch (err2) {
                 try {
-                    res.end(require('fs').readFileSync(require('path').resolve(__dirname, '..', 'error.html')));
+                    res.end(require('fs').readFileSync('./server/error.html'));
                 } catch (err3) {
                     res.end('<h1>Application Error</h1><p>Template file missing.</p>');
                 }
             }
         }
+    }
+}).listen(process.env.PORT || 3000);
