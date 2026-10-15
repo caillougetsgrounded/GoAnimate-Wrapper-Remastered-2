@@ -57,10 +57,12 @@ module.exports = http.createServer((req, res) => {
     } catch (err) {
         console.error(err);
         res.writeHead(500, { 'Content-Type': 'text/html' });
-        try {
-            res.end(require('fs').readFileSync(require('path').join(__dirname, 'error.html')));
+                try {
+            res.end(require('fs').readFileSync('./error.html'));
         } catch (e) {
-            res.end('<h1>Application Error</h1>');
+            try {
+                res.end(require('fs').readFileSync(require('path').join(__dirname, '..', 'error.html')));
+            } catch (err2) {
+                res.end('<h1>Application Error</h1>');
+            }
         }
-    }
-}).listen(env.PORT || env.SERVER_PORT);
